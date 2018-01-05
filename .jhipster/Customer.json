@@ -1,0 +1,27 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipName": "contact",
+            "otherEntityName": "contact",
+            "relationshipType": "one-to-many",
+            "otherEntityRelationshipName": "customer"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "name",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "address",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20180105151153",
+    "dto": "no",
+    "service": "serviceClass",
+    "entityTableName": "customer",
+    "jpaMetamodelFiltering": false,
+    "pagination": "no"
+}
