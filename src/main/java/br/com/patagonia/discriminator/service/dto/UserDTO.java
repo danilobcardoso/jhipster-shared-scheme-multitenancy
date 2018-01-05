@@ -51,6 +51,8 @@ public class UserDTO {
 
     private Instant lastModifiedDate;
 
+    private String tenantId;
+
     private Set<String> authorities;
 
     public UserDTO() {
@@ -70,6 +72,7 @@ public class UserDTO {
         this.createdDate = user.getCreatedDate();
         this.lastModifiedBy = user.getLastModifiedBy();
         this.lastModifiedDate = user.getLastModifiedDate();
+        this.tenantId = user.getTenantId();
         this.authorities = user.getAuthorities().stream()
             .map(Authority::getName)
             .collect(Collectors.toSet());
@@ -173,6 +176,14 @@ public class UserDTO {
 
     public Set<String> getAuthorities() {
         return authorities;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 
     public void setAuthorities(Set<String> authorities) {
