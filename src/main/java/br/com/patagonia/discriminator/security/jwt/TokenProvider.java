@@ -1,5 +1,6 @@
 package br.com.patagonia.discriminator.security.jwt;
 
+import br.com.patagonia.discriminator.security.ExtendedUserDetails;
 import io.github.jhipster.config.JHipsterProperties;
 
 import java.util.*;
@@ -23,6 +24,8 @@ public class TokenProvider {
     private final Logger log = LoggerFactory.getLogger(TokenProvider.class);
 
     private static final String AUTHORITIES_KEY = "auth";
+
+    private static final String TENANT_ID = "tenant";
 
     private String secretKey;
 
@@ -59,10 +62,13 @@ public class TokenProvider {
         } else {
             validity = new Date(now + this.tokenValidityInMilliseconds);
         }
+        ExtendedUserDetails userDetails = (ExtendedUserDetails)authentication.getPrincipal();
+        String tenantId = userDetails.getTenantId();
 
         return Jwts.builder()
             .setSubject(authentication.getName())
             .claim(AUTHORITIES_KEY, authorities)
+            .claim(TENANT_ID, tenantId)
             .signWith(SignatureAlgorithm.HS512, secretKey)
             .setExpiration(validity)
             .compact();
@@ -83,6 +89,18 @@ public class TokenProvider {
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
+
+    public String getTenantId(String token)
+    {
+
+        Claims claims = Jwts.parser()
+            .setSigningKey(secretKey)
+            .parseClaimsJws(token)
+            .getBody();
+
+        return claims.get(TENANT_ID).toString();
+    }
+
 
     public boolean validateToken(String authToken) {
         try {
