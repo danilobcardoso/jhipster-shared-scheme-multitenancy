@@ -1,6 +1,11 @@
 package br.com.patagonia.discriminator.domain;
 
+import br.com.patagonia.discriminator.tenancy.TenantContext;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.Filters;
+import org.hibernate.annotations.ParamDef;
 
 import javax.persistence.*;
 
@@ -14,6 +19,10 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "customer")
+@FilterDef(name="tenancyFilter",  parameters=@ParamDef( name="tenantId", type="string" ) )
+@Filters({
+    @Filter(name="tenancyFilter", condition = ":tenantId = tenant_id")
+})
 public class Customer implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -32,6 +41,9 @@ public class Customer implements Serializable {
     @OneToMany(mappedBy = "customer")
     @JsonIgnore
     private Set<Contact> contacts = new HashSet<>();
+
+    @Column(name = "tenant_id")
+    private String tenantId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -94,6 +106,15 @@ public class Customer implements Serializable {
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -122,4 +143,13 @@ public class Customer implements Serializable {
             ", address='" + getAddress() + "'" +
             "}";
     }
+
+    @PrePersist
+    @PreUpdate
+    private void beforeSave()
+    {
+        this.setTenantId(TenantContext.getCurrentTenant());
+    }
+
+
 }
