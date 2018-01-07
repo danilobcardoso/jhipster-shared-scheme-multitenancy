@@ -6,7 +6,12 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.Filters;
 import org.hibernate.annotations.ParamDef;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.PermissionDeniedDataAccessException;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.persistence.*;
 
 import java.io.Serializable;
@@ -23,7 +28,9 @@ import java.util.Objects;
 @Filters({
     @Filter(name="tenancyFilter", condition = ":tenantId = tenant_id")
 })
-public class Customer implements Serializable {
+public class Customer implements Serializable, TenantAwareDomain {
+
+    private static Logger logger = LoggerFactory.getLogger(Customer.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -143,13 +150,4 @@ public class Customer implements Serializable {
             ", address='" + getAddress() + "'" +
             "}";
     }
-
-    @PrePersist
-    @PreUpdate
-    private void beforeSave()
-    {
-        this.setTenantId(TenantContext.getCurrentTenant());
-    }
-
-
 }
